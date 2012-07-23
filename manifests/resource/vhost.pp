@@ -43,6 +43,7 @@ define nginx::resource::vhost(
   $ssl_key            = undef,
   $proxy              = undef,
   $proxy_read_timeout = '90',
+  $uwsgi              = undef,
   $index_files        = ['index.html', 'index.htm', 'index.php'],
   $www_root           = undef
 ) {
@@ -102,6 +103,7 @@ define nginx::resource::vhost(
     location           => '/',
     proxy              => $proxy,
     proxy_read_timeout => $proxy_read_timeout,
+    uwsgi              => $uwsgi,
     www_root           => $www_root,
     notify             => $nginx::manage_service_autorestart,
   }

@@ -1,4 +1,4 @@
   location <%= location %> {
-    root  <%= www_root %>;
+    <% if alias_root -%>alias<% else -%>root<% end -%>  <%= www_root %>;
     index <% index_files.each do |i| %> <%= i %> <% end %>; 
   }

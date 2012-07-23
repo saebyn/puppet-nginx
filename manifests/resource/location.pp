@@ -32,8 +32,11 @@ define nginx::resource::location(
   $index_files        = ['index.html', 'index.htm', 'index.php'],
   $proxy              = undef,
   $proxy_read_timeout = '90',
-  $ssl                = false,
+  $uwsgi              = undef,
+  $ssl                = absent,
   $option             = undef,
+  $alias_root         = false,
+  $fragment_id_base   = 500,
   $location
 ) {
   File {
@@ -49,9 +52,11 @@ define nginx::resource::location(
     default  => file,
   }
 
-  # Use proxy template if $proxy is defined, otherwise use directory template.
+  # Use proxy template if $proxy is defined, or uwsgi, or otherwise use directory template.
   if ($proxy != undef) {
     $content_real = template('nginx/vhost/vhost_location_proxy.erb')
+  } elsif ($uwsgi != undef) {
+    $content_real = template('nginx/vhost/vhost_location_uwsgi.erb')
   } else {
     $content_real = template('nginx/vhost/vhost_location_directory.erb')
   }
@@ -60,22 +65,24 @@ define nginx::resource::location(
   if ($vhost == undef) {
     fail('Cannot create a location reference without attaching to a virtual host')
   }
-  if (($www_root == undef) and ($proxy == undef)) {
+  if (($www_root == undef) and ($proxy == undef) and ($uwsgi == undef)) {
     fail('Cannot create a location reference without a www_root or proxy defined')
   }
-  if (($www_root != undef) and ($proxy != undef)) {
+  if (($www_root != undef) and ($proxy != undef) and ($uwsgi != undef)) {
     fail('Cannot define both directory and proxy in a virtual host')
   }
 
+  $fragment_id = $fragment_id_base
   ## Create stubs for vHost File Fragment Pattern
-  concat_fragment { "${vhost}+500.tmp":
+  concat_fragment { "${vhost}+$fragment_id.tmp":
     content => $content_real,
     ensure  => $ensure,
   }
 
+  $fragment_id_2 = $fragment_id + 1
   ## Only create SSL Specific locations if $ssl is true.
-  concat_fragment { "${vhost}+800-ssl.tmp":
+  concat_fragment { "${vhost}+$fragment_id_2-ssl.tmp":
     content => $content_real,
-    ensure => $ssl
+    ensure => $ssl,
   }
 }
