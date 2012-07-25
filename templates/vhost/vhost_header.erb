@@ -25,11 +25,12 @@ server {
   error_page 503 @maintenance;
 
   location @maintenance {
-      root <%= maintenance_path %>;
+      root <%= maintenance_path %>/;
       rewrite ^(.*)$ /index.html break;
   }
 
   location /maintenance-static/ {
-      alias <%= maintenance_path %>;
+      alias <%= maintenance_path %>/;
+      index index.html;
   }
   <% end %>
