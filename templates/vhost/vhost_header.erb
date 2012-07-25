@@ -7,3 +7,29 @@ server {
 
   server_name <%= name %>;
   access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= name %>.access.log;
+
+  <% if enable_maintenance %>
+  set $can503 0;
+  if ( -f <%= upgrading_file %> ) {
+      set $can503 1;
+  }
+
+  if ($uri ~* /maintenance-static/) {
+      set $can503 0;
+  }
+
+  if ($can503 = 1) {
+     return 503;
+  }
+
+  error_page 503 @maintenance;
+
+  location @maintenance {
+      root <%= maintenance_path %>;
+      rewrite ^(.*)$ /index.html break;
+  }
+
+  location /maintenance-static/ {
+      alias <%= maintenance_path %>;
+  }
+  <% end %>

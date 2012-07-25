@@ -30,6 +30,9 @@
 #    ssl      => present,
 #    ssl_cert => '/tmp/server.crt',
 #    ssl_key  => '/tmp/server.pem',
+#    enable_maintenance => true,
+#    maintenance_path => '/var/www/nginx-maintenance',
+#    upgrading_file => '/var/www/nginx-default/.upgrading',
 #  }
 define nginx::resource::vhost(
   $ensure             = 'enable',
@@ -45,7 +48,10 @@ define nginx::resource::vhost(
   $proxy_read_timeout = '90',
   $uwsgi              = undef,
   $index_files        = ['index.html', 'index.htm', 'index.php'],
-  $www_root           = undef
+  $www_root           = undef,
+  $enable_maintenance = false,
+  $maintenance_path   = '/var/www/nginx-maintenance',
+  $upgrading_file     = '/var/www/nginx-default/.upgrading'
 ) {
 
   File {
