@@ -1,4 +1,6 @@
   location <%= location %> {
     <% if alias_root -%>alias<% else -%>root<% end -%>  <%= www_root %>;
     index <% index_files.each do |i| %> <%= i %> <% end %>; 
+    expires 30d;
+    access_log off;
   }

@@ -90,7 +90,7 @@ class nginx::params {
   $source = ''
   $source_dir = ''
   $source_dir_purge = ''
-  $template = ''
+  $template = 'nginx/conf.d/nginx.conf.erb'
   $options = ''
   $service_autorestart = true
   $absent = false
